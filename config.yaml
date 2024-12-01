@@ -1,0 +1,5 @@
+interval: 6h
+notifications:
+  - repository: owner/repository
+    files:
+      - path: third_party/component/src
