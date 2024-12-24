@@ -1,5 +1,8 @@
 interval: 6h
+github_token: GITHUB_TOKEN
 notifications:
-  - repository: owner/repository
+  - repository:
+      name: owner
+      owner: repository
     files:
       - path: third_party/component/src
