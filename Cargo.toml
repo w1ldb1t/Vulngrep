@@ -10,3 +10,5 @@ octocrab = "0.32"
 tokio = { version = "1.0", features = ["full"] }
 futures = "0.3"
 anyhow = "1"
+directories = "5.0"
+thiserror = "1.0"

@@ -55,9 +55,13 @@ impl GithubRepository {
                 let sha = &commit.sha;
                 match self.client.commits(&self.owner, &self.name).get(sha).await {
                     Ok(commit_details) =>  {
+                        // add the detailed commit info to the list
                         all_commits.push(commit_details);
                     },
-                    Err(_) => {},
+                    Err(_) => {
+                        // request failed, but the commit is actually valid
+                        all_commits.push(commit);
+                    },
                 }
             }
 
@@ -71,6 +75,19 @@ impl GithubRepository {
         }
     }
 
+    pub async fn get_head(&self) -> Result<RepoCommit> {
+        let commits = self.client
+                .repos(&self.owner, &self.name)
+                .list_commits()
+                .per_page(1)
+                .page(1u32)
+                .send()
+                .await
+                .with_context(|| format!("Failed to fetch commits from {}/{}", self.owner, self.name))?;
+        let head_commit = commits.items.first().unwrap();
+        Ok(head_commit.clone())
+    }
+
     /// Gets repository owner
     pub fn owner(&self) -> &str {
         &self.owner
@@ -79,5 +96,10 @@ impl GithubRepository {
     /// Gets repository name
     pub fn name(&self) -> &str {
         &self.name
+    }
+
+    /// Gets owner/name
+    pub fn uri(&self) -> String {
+        format!("{}/{}", self.owner, self.name)
     }
 }
