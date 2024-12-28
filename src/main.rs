@@ -9,24 +9,6 @@ mod config;
 mod history;
 mod repository;
 
-fn parse_interval(interval_str: &str) -> Result<u64, String> {
-    let (value, unit) = interval_str.split_at(interval_str.len() - 1);
-
-    let numeric_value: u64 = match value.parse() {
-        Ok(num) => num,
-        Err(_) => return Err(format!("Invalid numeric value in interval: {}", value)),
-    };
-
-    match unit {
-        "h" => Ok(numeric_value * 3600), // hours to seconds
-        "m" => Ok(numeric_value * 60),   // minutes to seconds
-        _ => Err(format!(
-            "Invalid time unit: {}. Use 'h' for hours or 'm' for minutes.",
-            unit
-        )),
-    }
-}
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     // parse the yaml config & repo history
@@ -38,7 +20,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     if args.len() == 2 {
         let command = &args[1];
         if command == "config" {
-            let config_path = AppConfig::get_config_path()?;
+            let config_path: std::path::PathBuf = AppConfig::get_config_path()?;
             open::that(config_path.as_os_str())?;
         } else if command == "help" {
             println!("github-notify [config]")
@@ -47,20 +29,20 @@ async fn main() -> Result<(), Box<dyn Error>> {
     }
 
     // convert config str to interval
-    let interval_seconds = parse_interval(&config.interval)?;
+    let interval_seconds = config.interval();
     println!("Interval: {} seconds", interval_seconds);
 
     // bail out quickly if there are no desired notifications
-    if config.notifications.len() == 0 {
+    if config.notifications().len() == 0 {
         println!("No notifications found!");
         return Ok(())
     }
 
-    for notification in &config.notifications {
-        let config_rep = &notification.repository;
+    for notification in config.notifications() {
+        let config_rep = &notification.repository();
         let repo: GithubRepository;
 
-        match GithubRepository::new(&config_rep.owner, &config_rep.name, &config.github_token) {
+        match GithubRepository::new(&config_rep.owner, &config_rep.name, &config.token()) {
             Ok(github_repo) => {
                 repo = github_repo;
                 println!(
@@ -110,7 +92,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
                     for committed_file in commit.files.unwrap() {
                         let mut pattern_satisfied = false;
-                        for file in &notification.files {
+                        for file in notification.files() {
                             if committed_file.filename.contains(&file.path) {
                                 pattern_satisfied = true;
                                 continue;

@@ -17,15 +17,33 @@ pub struct Repository {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Notification {
-    pub repository: Repository,
-    pub files: Vec<File>,
+    repository: Repository,
+    files: Vec<File>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AppConfig {
-    pub interval: String,
-    pub github_token: String,
-    pub notifications: Vec<Notification>,
+    interval: String,
+    github_token: String,
+    notifications: Vec<Notification>,
+}
+
+impl Clone for Repository {
+    fn clone(&self) -> Self {
+        Repository {
+            name: self.name.clone(),
+            owner: self.owner.clone(),
+        }
+    }
+}
+
+impl Notification {
+    pub fn repository(&self) -> Repository {
+        self.repository.clone()
+    }
+    pub fn files(&self) -> &Vec<File> {
+        &self.files
+    }
 }
 
 impl AppConfig {
@@ -33,6 +51,24 @@ impl AppConfig {
     const QUALIFIER: &'static str = "com";
     const ORGANIZATION: &'static str = "wildbit";
     const APPLICATION: &'static str = "github_notify";
+
+    fn parse_interval(&self, interval_str: &str) -> Result<u64, String> {
+        let (value, unit) = interval_str.split_at(interval_str.len() - 1);
+    
+        let numeric_value: u64 = match value.parse() {
+            Ok(num) => num,
+            Err(_) => return Err(format!("Invalid numeric value in interval: {}", value)),
+        };
+    
+        match unit {
+            "h" => Ok(numeric_value * 3600), // hours to seconds
+            "m" => Ok(numeric_value * 60),   // minutes to seconds
+            _ => Err(format!(
+                "Invalid time unit: {}. Use 'h' for hours or 'm' for minutes.",
+                unit
+            )),
+        }
+    }
 
     /// Get the configuration file path based on the operating system
     pub fn get_config_path() -> Result<PathBuf, Box<dyn Error>> {
@@ -70,6 +106,29 @@ impl AppConfig {
         let contents = serde_yaml::to_string(self)?;
         fs::write(config_path, contents)?;
         Ok(())
+    }
+
+    /// The number of minutes to sleep between cycles
+    pub fn interval(&self) -> u64 {
+        match self.parse_interval(&self.interval) {
+            Ok(interval) =>  {
+                return interval;
+            },
+            Err(err) => {
+                eprintln!("{}", err);
+                return 60;
+            },
+        }
+    }
+
+    /// The GitHub token
+    pub fn token(&self) -> &String {
+        return &self.github_token;
+    }
+
+    /// The user-defined notifications
+    pub fn notifications(&self) -> &Vec<Notification> {
+        return &self.notifications
     }
 }
 
