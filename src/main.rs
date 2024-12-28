@@ -2,6 +2,8 @@ use config::AppConfig;
 use history::History;
 use repository::GithubRepository;
 use std::error::Error;
+use std::env;
+use open;
 
 mod config;
 mod history;
@@ -27,9 +29,22 @@ fn parse_interval(interval_str: &str) -> Result<u64, String> {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    // parse the yaml config
+    // parse the yaml config & repo history
     let config = AppConfig::load()?;
     let mut history = History::load()?;
+
+    // parse any console argument
+    let args: Vec<String> = env::args().collect();
+    if args.len() == 2 {
+        let command = &args[1];
+        if command == "config" {
+            let config_path = AppConfig::get_config_path()?;
+            open::that(config_path.as_os_str())?;
+        } else if command == "help" {
+            println!("github-notify [config]")
+        }
+        return Ok(())
+    }
 
     // convert config str to interval
     let interval_seconds = parse_interval(&config.interval)?;
