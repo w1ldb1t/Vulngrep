@@ -5,7 +5,22 @@
   <br>
 </h1>
 
-<h4 align="center">A tool for monitoring GitHub commits and alerting users based on customizable patterns.</h4>
+<h4 align="center">A tool for monitoring GitHub repositories and alerting users based on customizable patterns.</h4>
+
+<p align="center">
+  <a href="https://github.com/w1ldb1t/github-notify/actions/workflows/release.yml">
+    <img src="https://github.com/w1ldb1t/github-notify/actions/workflows/release.yml/badge.svg">
+  </a>
+</p>
+
+<p align="center">
+  <a href="#description">Description</a> •
+  <a href="#privacy">Privacy</a> •
+  <a href="#how-to-use">How To Use</a> •
+  <a href="#example-config">Example Config</a> •
+  <a href="#download">Download</a> •
+  <a href="#license">License</a>
+</p>
 
 ## Description
 The main goal of this tool is to help researchers stay up-to-date with the latest commits on open-source projects hosted by GitHub. The tool works exclusively using network requests through [Octocrab](https://github.com/XAMPPRocky/octocrab), a third-party GitHub API client.
