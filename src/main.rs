@@ -1,9 +1,11 @@
 use config::AppConfig;
 use history::History;
+use open;
 use repository::GithubRepository;
 use std::error::Error;
-use std::env;
-use open;
+use std::thread::sleep;
+use std::time::Duration;
+use std::{env, time};
 
 mod config;
 mod history;
@@ -28,16 +30,19 @@ async fn main() -> Result<(), Box<dyn Error>> {
         return Ok(())
     }
 
-    // convert config str to interval
-    let interval_seconds = config.interval();
-    println!("Interval: {} seconds", interval_seconds);
-
     // bail out quickly if there are no desired notifications
     if config.notifications().len() == 0 {
         println!("No notifications found!");
         return Ok(())
     }
 
+    loop {
+        let _ = perform_search(&config, &mut history).await;
+        sleep(Duration::from_secs(config.interval()));
+    }
+}
+
+async fn perform_search(config: &AppConfig, history: &mut History) -> Result<(), Box<dyn Error>> {
     for notification in config.notifications() {
         let config_rep = &notification.repository();
         let repo: GithubRepository;
@@ -119,6 +124,5 @@ async fn main() -> Result<(), Box<dyn Error>> {
             }
         }
     }
-
     Ok(())
 }
