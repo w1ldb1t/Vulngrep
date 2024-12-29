@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use anyhow::{Result, Context};  // Added Context trait
 use octocrab::models::repos::RepoCommit;
 

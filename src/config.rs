@@ -84,7 +84,6 @@ impl AppConfig {
     /// Load configuration from the default location
     pub fn load() -> Result<Self, Box<dyn Error>> {
         let config_path = Self::get_config_path()?;
-        println!("Config path: {}", config_path.display().to_string());
 
         if !config_path.exists() {
             // create default configuration
