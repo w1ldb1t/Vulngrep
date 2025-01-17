@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'git-notify'",
+            "name": "Debug executable 'github-notify'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=git-notify",
-                    "--package=git-notify"
+                    "--bin=github-notify",
+                    "--package=github-notify"
                 ],
                 "filter": {
-                    "name": "git-notify",
+                    "name": "github-notify",
                     "kind": "bin"
                 }
             },
@@ -25,16 +25,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'git-notify'",
+            "name": "Debug unit tests in executable 'github-notify'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=git-notify",
-                    "--package=git-notify"
+                    "--bin=github-notify",
+                    "--package=github-notify"
                 ],
                 "filter": {
-                    "name": "git-notify",
+                    "name": "github-notify",
                     "kind": "bin"
                 }
             },
