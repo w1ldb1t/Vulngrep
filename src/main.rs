@@ -2,6 +2,7 @@ use config::AppConfig;
 use console::style;
 use console::Term;
 use history::History;
+use notify_rust::{Notification, Timeout};
 use open;
 use repository::GithubRepository;
 use std::env;
@@ -159,6 +160,20 @@ async fn perform_search(
                             additions = style(committed_file.additions).green().underlined(),
                             deletions = style(committed_file.deletions).red().underlined(),
                         );
+
+                        #[cfg(all(unix))]
+                        static SOUND: &str = "message-new-instant";
+                        #[cfg(target_os = "windows")]
+                        static SOUND: &str = "Mail";
+                        let summary = format!("🔍 New matching commit in {0}", repo.uri());
+                        let author = commit.author.clone().unwrap();
+                        let body: String = format!("👤 {0}\n🔗 {1}", author.login, commit.sha);
+                        Notification::new()
+                            .summary(&summary)
+                            .body(&body)
+                            .sound_name(SOUND)
+                            .timeout(Timeout::Never) // persistent
+                            .show()?;
                     }
                 }
             }
