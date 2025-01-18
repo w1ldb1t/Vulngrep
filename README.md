@@ -53,7 +53,7 @@ $ cargo run config
 ## Example config
 
 ```yaml
-interval: 6h
+interval: 6h # optional
 github_token: GITHUB_TOKEN
 notifications:
   - repository:
