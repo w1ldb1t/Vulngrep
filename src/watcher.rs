@@ -26,15 +26,24 @@ impl RepositoryWatcher {
     pub async fn run(&mut self) -> Result<(), Box<dyn Error>> {
         self.display.config_loaded();
 
+        // if the notification config is empty bail out quickly
         if self.config.notifications().is_empty() {
             self.display.empty_config();
             return Ok(());
         }
 
-        loop {
-            self.process_repositories().await?;
-            sleep(Duration::from_secs(self.config.interval()));
+        // process repositories at least once
+        self.process_repositories().await?;
+
+        // if interval is set, continue monitoring
+        if let Some(interval_secs) = self.config.interval() {
+            loop {
+                sleep(Duration::from_secs(interval_secs));
+                self.process_repositories().await?;
+            }
         }
+
+        Ok(())
     }
 
     /// Goes over all repositories, and notifies the user for any matching rules

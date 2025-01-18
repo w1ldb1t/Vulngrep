@@ -23,7 +23,7 @@ pub struct Notification {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AppConfig {
-    interval: String,
+    interval: Option<String>,
     github_token: String,
     notifications: Vec<Notification>,
 }
@@ -107,17 +107,17 @@ impl AppConfig {
         Ok(())
     }
 
-    /// The number of minutes to sleep between cycles
-    pub fn interval(&self) -> u64 {
-        match self.parse_interval(&self.interval) {
-            Ok(interval) =>  {
-                return interval;
-            },
-            Err(err) => {
-                eprintln!("{}", err);
-                return 60;
-            },
-        }
+    /// Returns None for one-time execution, or how many seconds to sleep between cycles
+    pub fn interval(&self) -> Option<u64> {
+        self.interval.as_ref().and_then(|interval_str| {
+            match self.parse_interval(interval_str) {
+                Ok(interval) => Some(interval),
+                Err(err) => {
+                    eprintln!("{}", err);
+                    Some(60) // default to 60 secs
+                }
+            }
+        })
     }
 
     /// The GitHub token
@@ -134,7 +134,7 @@ impl AppConfig {
 impl Default for AppConfig {
     fn default() -> Self {
         Self {
-            interval: "6h".to_owned(),
+            interval: None,
             github_token: "GITHUB_TOKEN".to_owned(),
             notifications: vec![],
         }
