@@ -3,7 +3,6 @@ use crate::history::History;
 use crate::repository::GithubRepository;
 use crate::terminal::TerminalDisplay;
 use std::error::Error;
-use std::thread::sleep;
 use std::time::Duration;
 
 pub struct RepositoryWatcher {
@@ -35,10 +34,14 @@ impl RepositoryWatcher {
         // process repositories at least once
         self.process_repositories().await?;
 
-        // if interval is set, continue monitoring
+        // if interval is set, continue monitoring with countdown
         if let Some(interval_secs) = self.config.interval() {
+            let interval = Duration::from_secs(interval_secs);
             loop {
-                sleep(Duration::from_secs(interval_secs));
+                // show countdown
+                self.display.show_countdown(interval)?;
+                
+                // process repositories again
                 self.process_repositories().await?;
             }
         }

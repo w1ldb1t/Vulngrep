@@ -2,6 +2,8 @@ use console::{style, Term};
 use notify_rust::{Notification as SystemNotification, Timeout};
 use crate::repository::GithubRepository;
 use std::error::Error;
+use std::thread::sleep;
+use std::time::{Duration, Instant};
 
 pub struct TerminalDisplay {
     term: Term,
@@ -106,6 +108,37 @@ impl TerminalDisplay {
             .timeout(Timeout::Never)
             .show()?;
             
+        Ok(())
+    }
+
+    pub fn show_countdown(&self, duration: Duration) -> Result<(), Box<dyn Error>> {
+        let start_time = Instant::now();
+        let end_time = start_time + duration;
+        
+        // update every second
+        while Instant::now() < end_time {
+            let remaining = end_time - Instant::now();
+            let hours = remaining.as_secs() / 3600;
+            let minutes = (remaining.as_secs() % 3600) / 60;
+            let seconds = remaining.as_secs() % 60;
+
+            // format countdown message
+            let countdown_msg = format!(
+                "{} Next check in {:02}:{:02}:{:02}",
+                style("[⏰]").blue().bold(),
+                hours,
+                minutes,
+                seconds
+            );
+
+            // print new countdown
+            println!("{}", countdown_msg);
+            // sleep for 1 second
+            sleep(Duration::from_secs(1));
+            // clear previous countdown
+            self.clear_lines(1)?;
+        }
+        
         Ok(())
     }
 
