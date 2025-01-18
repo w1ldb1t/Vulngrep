@@ -1,6 +1,6 @@
 #![allow(unused)]
 
-use anyhow::{Result, Context};  // Added Context trait
+use anyhow::{Result, Context};
 use octocrab::models::repos::RepoCommit;
 
 #[derive(Debug, Clone)]
@@ -11,7 +11,7 @@ pub struct GithubRepository {
 }
 
 impl GithubRepository {
-    /// Creates a new Repository instance
+    /// Creates a new GithubRepository instance
     pub fn new(owner: impl Into<String>, name: impl Into<String>, token: &str) -> Result<Self> {
         let client = octocrab::OctocrabBuilder::new()
             .personal_token(token.to_string())
@@ -77,6 +77,7 @@ impl GithubRepository {
         }
     }
 
+    // Gets the HEAD commit of the current repository
     pub async fn get_head(&self) -> Result<RepoCommit> {
         let commits = self.client
                 .repos(&self.owner, &self.name)
@@ -102,6 +103,6 @@ impl GithubRepository {
 
     /// Gets owner/name
     pub fn uri(&self) -> String {
-        format!("{}/{}", self.owner, self.name)
+        format!("{}/{}", self.owner(), self.name())
     }
 }
