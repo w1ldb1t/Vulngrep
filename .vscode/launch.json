@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'github-notify'",
+            "name": "Debug executable 'vulngrep'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=github-notify",
-                    "--package=github-notify"
+                    "--bin=vulngrep",
+                    "--package=vulngrep"
                 ],
                 "filter": {
-                    "name": "github-notify",
+                    "name": "vulngrep",
                     "kind": "bin"
                 }
             },
@@ -25,16 +25,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'github-notify'",
+            "name": "Debug unit tests in executable 'vulngrep'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=github-notify",
-                    "--package=github-notify"
+                    "--bin=vulngrep",
+                    "--package=vulngrep"
                 ],
                 "filter": {
-                    "name": "github-notify",
+                    "name": "vulngrep",
                     "kind": "bin"
                 }
             },

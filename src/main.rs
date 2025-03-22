@@ -20,7 +20,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             open::that(config_path.as_os_str())?;
             return Ok(());
         }
-        println!("Usage: github-notify [config]");
+        println!("Usage: vulngrep [config]");
         return Ok(());
     }
 

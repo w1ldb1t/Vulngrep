@@ -50,7 +50,7 @@ impl AppConfig {
     const CONFIG_FILENAME: &'static str = "config.yaml";
     const QUALIFIER: &'static str = "com";
     const ORGANIZATION: &'static str = "wildbit";
-    const APPLICATION: &'static str = "github_notify";
+    const APPLICATION: &'static str = "vulngrep";
 
     fn parse_interval(&self, interval_str: &str) -> Result<u64, String> {
         let (value, unit) = interval_str.split_at(interval_str.len() - 1);

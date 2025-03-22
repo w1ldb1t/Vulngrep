@@ -16,7 +16,7 @@ impl History {
     const CONFIG_FILENAME: &'static str = "history.yaml";
     const QUALIFIER: &'static str = "com";
     const ORGANIZATION: &'static str = "wildbit";
-    const APPLICATION: &'static str = "github_notify";
+    const APPLICATION: &'static str = "vulngrep";
 
     /// Get the configuration file path based on the operating system
     pub fn get_config_path() -> Result<PathBuf, Box<dyn Error>> {

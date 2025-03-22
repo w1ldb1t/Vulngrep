@@ -1,15 +1,15 @@
 
 <h1 align="center">
   <br>
-  Github Notify
+  Vulngrep
   <br>
 </h1>
 
 <h4 align="center">A tool for monitoring GitHub repositories and alerting users based on customizable patterns.</h4>
 
 <p align="center">
-  <a href="https://github.com/w1ldb1t/github-notify/actions/workflows/release.yml">
-    <img src="https://github.com/w1ldb1t/github-notify/actions/workflows/release.yml/badge.svg">
+  <a href="https://github.com/w1ldb1t/vulngrep/actions/workflows/release.yml">
+    <img src="https://github.com/w1ldb1t/vulngrep/actions/workflows/release.yml/badge.svg">
   </a>
 </p>
 
@@ -35,10 +35,10 @@ To clone and run this application, you'll need [Git](https://git-scm.com/) and [
 
 ```bash
 # Clone this repository
-$ git clone https://github.com/w1ldb1t/github-notify.git
+$ git clone https://github.com/w1ldb1t/vulngrep.git
 
 # Go into the repository
-$ cd github-notify
+$ cd vulngrep
 
 # Build the app
 $ cargo build
@@ -66,7 +66,7 @@ notifications:
 
 ## Download
 
-You can [download](https://github.com/w1ldb1t/github-notify/releases) the latest installable version of `github-notify` for Windows and Linux.
+You can [download](https://github.com/w1ldb1t/vulngrep/releases) the latest installable version of `vulngrep` for Windows and Linux.
 
 ## License
 
