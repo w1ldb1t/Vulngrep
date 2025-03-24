@@ -7,6 +7,7 @@ use std::path::PathBuf;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct File {
     pub path: String,
+    pub pattern: Option<Vec<String>>
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -19,6 +20,7 @@ pub struct Repository {
 pub struct Notification {
     repository: Repository,
     files: Vec<File>,
+    pattern: Option<Vec<String>>
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -43,6 +45,9 @@ impl Notification {
     }
     pub fn files(&self) -> &Vec<File> {
         &self.files
+    }
+    pub fn patterns(&self) -> Option<Vec<String>> {
+        self.pattern.clone()
     }
 }
 

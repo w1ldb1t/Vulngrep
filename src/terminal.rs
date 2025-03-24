@@ -61,9 +61,35 @@ impl TerminalDisplay {
         &self,
         commit_url: &str,
         commit_sha: &str,
+        pattern: &str
+    ) {
+        // make the commit's hash a clickable link to the official github page
+        let commit_to_link = format!(
+            "\x1B]8;;{}\x07{}\x1B]8;;\x07",
+            commit_url,
+            commit_sha
+        );
+        println!(
+            "{:>4}{} Commit SHA: {}",
+            "",
+            style("[!]").yellow().bold(),
+            style(commit_to_link).blue().underlined(),
+        );
+        println!(
+            "{:>7} Pattern matched: {}",
+            "",
+            style(pattern).white().bold(),
+        );
+    }
+
+    pub fn full_commit_info(
+        &self,
+        commit_url: &str,
+        commit_sha: &str,
         filename: &str,
         additions: u64,
         deletions: u64,
+        patterns_matched: Vec<String>
     ) {
         // make the commit's hash a clickable link to the official github page
         let commit_to_link = format!(
@@ -85,6 +111,13 @@ impl TerminalDisplay {
             additions = style(additions).green().underlined(),
             deletions = style(deletions).red().underlined(),
         );
+        for pattern in patterns_matched {
+            println!(
+                "{:>7} Pattern matched: {}",
+                "",
+                style(pattern).white().bold(),
+            );
+        }
     }
 
     pub fn commit_notification(
