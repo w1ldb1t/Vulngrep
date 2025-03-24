@@ -60,8 +60,16 @@ notifications:
       name: linux
       owner: torvalds
     files:
-      - path: drivers/phy/phy-core.c
       - path: fs/btrfs/sysfs.c
+      - path: drivers/phy/phy-core.c
+        pattern:
+          # per-file patterns
+          - "refcount_add(*)"
+          - "refcount_add_not_zero(*)"
+    pattern:
+      # global repository patterns
+      - "UAF"
+      - "Overflow"
 ```
 
 ## Download
