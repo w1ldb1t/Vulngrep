@@ -76,7 +76,15 @@ impl RepositoryWatcher {
             };
 
             // Process head commit
-            let head_commit = repo.get_head().await?;
+            let head_commit = match repo.get_head().await {
+                Ok(commit) => commit,
+                Err(err) => {
+                    self.display
+                        .repository_error(&err.to_string());
+                    continue;
+                }
+            };
+
             if !self.history.has(&repo) {
                 self.history.add(&repo, head_commit.sha);
                 self.history.save()?;
