@@ -1,6 +1,6 @@
-use std::collections::HashMap;
 use directories::ProjectDirs;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
 use std::path::PathBuf;
@@ -9,7 +9,7 @@ use crate::repository::GithubRepository;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct History {
-    repositories: HashMap<String, String>
+    repositories: HashMap<String, String>,
 }
 
 impl History {
@@ -52,17 +52,17 @@ impl History {
         Ok(())
     }
 
-    // Verifies whether there is a record for a given repository
-    pub fn has(&self, repo : &GithubRepository) -> bool {
+    /// Verifies whether there is a record for a given repository
+    pub fn has(&self, repo: &GithubRepository) -> bool {
         return self.repositories.contains_key(repo.uri().as_str());
     }
 
-    // Update/add a record for a given repository
-    pub fn add(&mut self, repo : &GithubRepository, hash : String) {
+    /// Update/add a record for a given repository
+    pub fn add(&mut self, repo: &GithubRepository, hash: String) {
         self.repositories.insert(repo.uri(), hash);
     }
 
-    // Find the last hash checked for this repository (assumes that it exists)
+    /// Find the last hash checked for this repository (assumes that it exists)
     pub fn find(&self, repo: &GithubRepository) -> Result<String, Box<dyn Error>> {
         self.repositories
             .get(repo.uri().as_str())
@@ -73,6 +73,8 @@ impl History {
 
 impl Default for History {
     fn default() -> Self {
-        Self { repositories: Default::default() }
+        Self {
+            repositories: Default::default(),
+        }
     }
 }

@@ -23,8 +23,8 @@ impl TerminalDisplay {
         );
     }
 
-    pub fn empty_config(&self) {
-        println!("{} Notification config is empty!", style("[!]").yellow().bold());
+    pub fn display_warning(&self, msg: &str) {
+        println!("{} {}", style("[!]").yellow().bold(), msg);
     }
 
     pub fn inspect(&self, repo: &GithubRepository) {
@@ -35,8 +35,8 @@ impl TerminalDisplay {
         println!("{} {}", style("[*]").blue().bold(), header);
     }
 
-    pub fn repository_error(&self, error: &str) {
-        eprintln!("{} {}", style("✗").red().bold(), error);
+    pub fn display_error(&self, msg: &str) {
+        eprintln!("{} {}", style("[✗]").red().bold(), msg);
     }
 
     pub fn repository_added(&self, repo: &GithubRepository) -> Result<(), Box<dyn Error>> {

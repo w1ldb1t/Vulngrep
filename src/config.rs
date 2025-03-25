@@ -6,14 +6,14 @@ use std::path::PathBuf;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct File {
-    pub path: String,
-    pub pattern: Option<Vec<String>>
+    path: String,
+    pattern: Option<Vec<String>>
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Repository {
-    pub name: String,
-    pub owner: String,
+    name: String,
+    owner: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -28,6 +28,27 @@ pub struct AppConfig {
     interval: Option<String>,
     github_token: String,
     notifications: Vec<Notification>,
+}
+
+impl File {
+    pub fn path(&self) -> &str {
+        &self.path
+    }
+    pub fn pattern(&self) -> Option<Vec<String>> {
+        self.pattern.clone()
+    }
+}
+
+impl Repository {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+    pub fn owner(&self) -> &str {
+        &self.owner
+    }
+    pub fn uri(&self) -> String {
+        format!("{}/{}", self.owner(), self.name())
+    }
 }
 
 impl Clone for Repository {

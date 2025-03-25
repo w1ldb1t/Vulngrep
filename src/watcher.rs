@@ -1,24 +1,25 @@
 use crate::config::AppConfig;
 use crate::history::History;
-use crate::repository::GithubRepository;
+use crate::repository::{GithubRepository, GithubRepositoryError};
 use crate::terminal::TerminalDisplay;
 use std::error::Error;
+use std::rc::Rc;
 use std::time::Duration;
 use wildmatch::WildMatch;
 
 pub struct RepositoryWatcher {
     config: AppConfig,
     history: History,
-    display: TerminalDisplay,
+    display: Rc<TerminalDisplay>,
 }
 
 impl RepositoryWatcher {
     /// Creates a new RepositoryWatcher instance
-    pub fn new() -> Result<Self, Box<dyn Error>> {
+    pub fn new(display: Rc<TerminalDisplay>) -> Result<Self, Box<dyn Error>> {
         Ok(Self {
             config: AppConfig::load()?,
             history: History::load()?,
-            display: TerminalDisplay::new(),
+            display,
         })
     }
 
@@ -28,7 +29,8 @@ impl RepositoryWatcher {
 
         // if the notification config is empty bail out quickly
         if self.config.notifications().is_empty() {
-            self.display.empty_config();
+            self.display
+                .display_warning("Notification config is empty!");
             return Ok(());
         }
 
@@ -50,9 +52,9 @@ impl RepositoryWatcher {
         Ok(())
     }
 
-    // Creates a wildcard out of the string, and makes it inclusive
-    fn make_pattern(&self, pattern: &String) -> WildMatch {
-        let inclusive_pattern = format!("*{}*", pattern);
+    /// Creates a wildcard out of the string, and makes it inclusive
+    fn make_pattern(&self, pattern: impl Into<String>) -> WildMatch {
+        let inclusive_pattern = format!("*{}*", pattern.into());
         WildMatch::new(&inclusive_pattern.as_str())
     }
 
@@ -61,16 +63,25 @@ impl RepositoryWatcher {
         for notification in self.config.notifications() {
             let config_rep = &notification.repository();
             let repo = match GithubRepository::new(
-                &config_rep.owner,
-                &config_rep.name,
+                config_rep.owner(),
+                config_rep.name(),
                 &self.config.token(),
-            ) {
+            )
+            .await
+            {
                 Ok(repo) => {
                     self.display.inspect(&repo);
                     repo
                 }
+                Err(GithubRepositoryError::InvalidRepository) => {
+                    // For an invalid repo, we should simply tell the user
+                    // and move to the next one. Don't cancel the entire run.
+                    let err = format!("Repository {} not found. Skipping it ...", config_rep.uri());
+                    self.display.display_warning(err.as_str());
+                    continue;
+                }
                 Err(error) => {
-                    self.display.repository_error(&error.to_string());
+                    // Fatal error
                     return Err(error.into());
                 }
             };
@@ -79,8 +90,7 @@ impl RepositoryWatcher {
             let head_commit = match repo.get_head().await {
                 Ok(commit) => commit,
                 Err(err) => {
-                    self.display
-                        .repository_error(&err.to_string());
+                    self.display.display_error(&err.to_string());
                     continue;
                 }
             };
@@ -151,14 +161,15 @@ impl RepositoryWatcher {
                                 let mut patterns_responsible_for_hit: Vec<String> = Vec::new();
 
                                 for file in notification.files() {
-                                    let file_path_matches = self.make_pattern(&file.path)
+                                    let file_path_matches = self
+                                        .make_pattern(file.path())
                                         .matches(&committed_file.filename);
                                     if !file_path_matches {
                                         break;
                                     }
 
                                     // Is there a matching file path with no patterns?
-                                    if file_path_matches && file.pattern.is_none() {
+                                    if file_path_matches && file.pattern().is_none() {
                                         is_commit_of_interest = true;
                                         break;
                                     }
@@ -166,13 +177,13 @@ impl RepositoryWatcher {
                                     // Is there a matching file-wide or repository-wide pattern?
                                     if let Some(patch) = &committed_file.patch {
                                         let patterns_list =
-                                            [&file.pattern, &notification.patterns()];
+                                            [&file.pattern(), &notification.patterns()];
 
                                         for patterns in patterns_list {
                                             if let Some(patterns) = patterns {
                                                 if let Some(pattern) =
                                                     patterns.iter().find(|pattern| {
-                                                        self.make_pattern(pattern).matches(patch)
+                                                        self.make_pattern(*pattern).matches(patch)
                                                     })
                                                 {
                                                     patterns_responsible_for_hit
@@ -221,7 +232,7 @@ impl RepositoryWatcher {
                     }
                 }
                 Err(error) => {
-                    self.display.repository_error(&error.to_string());
+                    self.display.display_error(&error.to_string());
                     continue;
                 }
             }

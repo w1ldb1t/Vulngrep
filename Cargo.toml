@@ -6,11 +6,11 @@ edition = "2021"
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.9"
-octocrab = "0.32"
+octocrab = "0.43.0"
 tokio = { version = "1.0", features = ["full"] }
-anyhow = "1"
-directories = "5.0"
-open = "3.2"
+directories = "6.0.0"
+open = "5.3.2"
 console = "0.15"
 notify-rust = "4.9"
 wildmatch = "2.4.0"
+thiserror = "2.0.12"
