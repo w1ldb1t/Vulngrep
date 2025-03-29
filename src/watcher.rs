@@ -156,46 +156,48 @@ impl RepositoryWatcher {
                             continue;
                         }
 
-                        if let Some(files) = commit.files {
-                            for committed_file in files {
+                        if let Some(committed_files) = commit.files {
+                            for committed_file in committed_files {
                                 let mut patterns_responsible_for_hit: Vec<String> = Vec::new();
 
-                                for file in notification.files() {
-                                    let file_path_matches = self
-                                        .make_pattern(file.path())
-                                        .matches(&committed_file.filename);
-                                    if !file_path_matches {
-                                        break;
-                                    }
+                                if let Some(notification_files) = notification.files() {
+                                    for file in notification_files {
+                                        let file_path_matches = self
+                                            .make_pattern(file.path())
+                                            .matches(&committed_file.filename);
+                                        if !file_path_matches {
+                                            break;
+                                        }
 
-                                    // Is there a matching file path with no patterns?
-                                    if file_path_matches && file.pattern().is_none() {
-                                        is_commit_of_interest = true;
-                                        break;
-                                    }
+                                        // Is there a matching file path with no patterns?
+                                        if file_path_matches && file.pattern().is_none() {
+                                            is_commit_of_interest = true;
+                                            break;
+                                        }
 
-                                    // Is there a matching file-wide or repository-wide pattern?
-                                    if let Some(patch) = &committed_file.patch {
-                                        let patterns_list =
-                                            [&file.pattern(), &notification.patterns()];
+                                        // Is there a matching file-wide or repository-wide pattern?
+                                        if let Some(patch) = &committed_file.patch {
+                                            let patterns_list =
+                                                [&file.pattern(), &notification.patterns()];
 
-                                        for patterns in patterns_list {
-                                            if let Some(patterns) = patterns {
-                                                if let Some(pattern) =
-                                                    patterns.iter().find(|pattern| {
-                                                        self.make_pattern(*pattern).matches(patch)
-                                                    })
-                                                {
-                                                    patterns_responsible_for_hit
-                                                        .push(pattern.to_string());
-                                                    is_commit_of_interest = true;
-                                                    break;
+                                            for patterns in patterns_list {
+                                                if let Some(patterns) = patterns {
+                                                    if let Some(pattern) =
+                                                        patterns.iter().find(|pattern| {
+                                                            self.make_pattern(*pattern).matches(patch)
+                                                        })
+                                                    {
+                                                        patterns_responsible_for_hit
+                                                            .push(pattern.to_string());
+                                                        is_commit_of_interest = true;
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                    if is_commit_of_interest {
-                                        break;
+                                        if is_commit_of_interest {
+                                            break;
+                                        }
                                     }
                                 }
 

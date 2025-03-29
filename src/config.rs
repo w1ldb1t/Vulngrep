@@ -19,7 +19,7 @@ pub struct Repository {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Notification {
     repository: Repository,
-    files: Vec<File>,
+    files: Option<Vec<File>>,
     pattern: Option<Vec<String>>
 }
 
@@ -64,7 +64,7 @@ impl Notification {
     pub fn repository(&self) -> Repository {
         self.repository.clone()
     }
-    pub fn files(&self) -> &Vec<File> {
+    pub fn files(&self) -> &Option<Vec<File>> {
         &self.files
     }
     pub fn patterns(&self) -> Option<Vec<String>> {
