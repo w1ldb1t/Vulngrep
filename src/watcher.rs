@@ -55,7 +55,7 @@ impl RepositoryWatcher {
     /// Creates a wildcard out of the string, and makes it inclusive
     fn make_pattern(&self, pattern: impl Into<String>) -> WildMatch {
         let inclusive_pattern = format!("*{}*", pattern.into());
-        WildMatch::new(&inclusive_pattern.as_str())
+        WildMatch::new_case_insensitive(&inclusive_pattern.as_str())
     }
 
     /// Goes over all repositories, and notifies the user for any matching rules
